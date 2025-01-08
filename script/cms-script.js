@@ -92,10 +92,25 @@
     const modalDiscountCheckbox = document.querySelector('.modal__checkbox');
     const modalDiscountInput = document.querySelector('.modal__input_discount');
     const overlay = document.querySelector('.overlay');
-    overlay.classList.remove('active');
+    const modalWindow = document.querySelector('.modal');
+    const modalClose = document.querySelector('.modal__close');
+    const btnAdd = document.querySelector('.panel__add-goods');
+
+    const toggleModal = () => {
+      overlay.classList.toggle('active');
+    };
+
+    toggleModal();
 
     const goods = JSON.parse(jsonData);
     renderGoods(goods);
+
+    btnAdd.addEventListener('click', toggleModal);
+    overlay.addEventListener('click', toggleModal);
+    modalClose.addEventListener('click', toggleModal);
+    modalWindow.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
   };
 
   window.cms = init;
