@@ -181,7 +181,7 @@
       discount_count: discountCount,
       count,
       price,
-      image
+      image,
     } = form;
 
     setFormAttributes(form);
