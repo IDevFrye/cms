@@ -79,17 +79,31 @@
     return tr;
   };
 
-  const renderGoods = (objArr) => {
+  const renderGoods = (objArr, totalField) => {
     const tbody = document.querySelector('.table__body');
     tbody.innerHTML = '';
     objArr.forEach((item, index) => {
       tbody.append(createRow(item, index));
     });
+
+    const total = [...objArr].reduce(
+      (acc, item) => acc + item.count * item.price,
+      0);
+    totalField.textContent = `$ ${(Number(total)).toFixed(2)}`;
   };
 
-  const toggleModal = (overlay) => {
+  const randomizeId = (min, max) => {
+    const minCeiled = Math.ceil(min);
+    const maxFloored = Math.floor(max);
+    return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled);
+  };
+
+  const toggleModal = (vendorId, total, overlay, {min, max}) => {
     const openModal = () => {
       overlay.classList.add('active');
+      const newId = randomizeId(min, max);
+      vendorId.textContent = newId;
+      total.textContent = '$ 0.00';
     };
 
     const closeModal = () => {
@@ -112,7 +126,7 @@
     });
   };
 
-  const deleteControl = (tableBody, goods) => {
+  const deleteControl = (tableBody, goods, total) => {
     tableBody.addEventListener('click', e => {
       const target = e.target;
       if (target.classList.contains('table__btn_del')) {
@@ -124,31 +138,120 @@
         if (indexToRemove !== -1) {
           goods.splice(indexToRemove, 1);
         };
-        renderGoods(goods);
+        renderGoods(goods, total);
 
         console.log('Обновлённые данные:', goods);
       };
     });
   };
 
-  const init = () => {
+  const toggleInput = (input) => {
+    input.disabled = !input.disabled;
+  };
+
+  const setFormAttributes = (form) => {
+    Array.from(form.elements).forEach(input => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(input.tagName)) {
+        if (!['image', 'discount', 'discount_count'].includes(input.name)) {
+          input.required = true;
+
+          if (input.tagName === 'INPUT') {
+            if (['count', 'price'].includes(input.name)) {
+              input.type = 'number';
+            } else {
+              input.type = 'text';
+            }
+          }
+        } else if (input.name === 'discount') {
+          input.type = 'checkbox';
+        } else if (input.name === 'discount_count') {
+          input.type = 'number';
+        };
+      };
+    });
+  };
+
+  const formControl = (form, goods, cmsTotal, vendorId, total, closeModal) => {
+    const {
+      name: title,
+      category,
+      description,
+      units,
+      discount,
+      discount_count: discountCount,
+      count,
+      price,
+      image
+    } = form;
+
+    setFormAttributes(form);
+
+    discount.addEventListener('change', e => {
+      if (!discountCount.disabled) {
+        discountCount.value = '';
+      }
+      toggleInput(discountCount);
+    });
+
+    count.addEventListener('change', () => {
+      total.textContent = `$ ${(count.value * price.value).toFixed(2)}`;
+    });
+
+    price.addEventListener('change', () => {
+      total.textContent = `$ ${(count.value * price.value).toFixed(2)}`;
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const newGood = {
+        id: Number(vendorId.textContent),
+        title: formData.get('name'),
+        category: formData.get('category'),
+        description: formData.get('description'),
+        units: formData.get('units'),
+        discont: Number(formData.get('discount_count')) ||
+          Boolean(formData.get('discount')),
+        count: Number(formData.get('count')),
+        price: Number(formData.get('price')),
+        images: {
+          small: formData.get('image') || 'img/default-small.jpg',
+          big: formData.get('image') || 'img/default-big.jpg',
+        },
+      };
+      goods.push(newGood);
+      renderGoods(goods, cmsTotal);
+      console.log('Обновлённые данные:', goods);
+
+      form.reset();
+      closeModal();
+    });
+  };
+
+  const init = (idBounds) => {
     const modalTitle = document.querySelector('.modal__title');
-    const modalForm = document.querySelector('.modal__form');
     const modalDiscountCheckbox = document.querySelector('.modal__checkbox');
     const modalDiscountInput = document.querySelector('.modal__input_discount');
-    const overlay = document.querySelector('.overlay');
     const modalWindow = document.querySelector('.modal');
+    const overlay = document.querySelector('.overlay');
+    const modalForm = document.querySelector('.modal__form');
+    const modalTotal = document.querySelector('.modal__total-price');
     const btnAdd = document.querySelector('.panel__add-goods');
     const tableBody = document.querySelector('.table__body');
+    const vendorId = document.querySelector('.vendor-code__id');
+    const totalField = document.querySelector('.cms__total-price');
 
-    const {openModal, closeModal} = toggleModal(overlay);
+    const {openModal, closeModal} = toggleModal(vendorId, modalTotal,
+      overlay, idBounds);
     closeModal();
 
     const goods = JSON.parse(jsonData);
-    renderGoods(goods);
+    renderGoods(goods, totalField);
 
     modalControl(btnAdd, overlay, openModal, closeModal);
-    deleteControl(tableBody, goods);
+    deleteControl(tableBody, goods, totalField);
+    formControl(modalForm, goods, totalField, vendorId, modalTotal, closeModal);
   };
 
   window.cms = init;
