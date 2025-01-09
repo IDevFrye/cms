@@ -87,32 +87,32 @@
     });
   };
 
-  const init = () => {
-    const modalTitle = document.querySelector('.modal__title');
-    const modalForm = document.querySelector('.modal__form');
-    const modalDiscountCheckbox = document.querySelector('.modal__checkbox');
-    const modalDiscountInput = document.querySelector('.modal__input_discount');
-    const overlay = document.querySelector('.overlay');
-    const modalWindow = document.querySelector('.modal');
-    const btnAdd = document.querySelector('.panel__add-goods');
-    const tableBody = document.querySelector('.table__body');
-
-    const toggleModal = () => {
-      overlay.classList.toggle('active');
+  const toggleModal = (overlay) => {
+    const openModal = () => {
+      overlay.classList.add('active');
     };
 
-    toggleModal();
+    const closeModal = () => {
+      overlay.classList.remove('active');
+    };
 
-    const goods = JSON.parse(jsonData);
-    renderGoods(goods);
+    return {
+      openModal,
+      closeModal,
+    };
+  };
 
-    btnAdd.addEventListener('click', toggleModal);
+  const modalControl = (btnAdd, overlay, openModal, closeModal) => {
+    btnAdd.addEventListener('click', openModal);
     overlay.addEventListener('click', e => {
       const target = e.target;
       if (target === overlay || target.closest('.modal__close')) {
-        toggleModal();
+        closeModal();
       };
     });
+  };
+
+  const deleteControl = (tableBody, goods) => {
     tableBody.addEventListener('click', e => {
       const target = e.target;
       if (target.classList.contains('table__btn_del')) {
@@ -129,6 +129,26 @@
         console.log('Обновлённые данные:', goods);
       };
     });
+  };
+
+  const init = () => {
+    const modalTitle = document.querySelector('.modal__title');
+    const modalForm = document.querySelector('.modal__form');
+    const modalDiscountCheckbox = document.querySelector('.modal__checkbox');
+    const modalDiscountInput = document.querySelector('.modal__input_discount');
+    const overlay = document.querySelector('.overlay');
+    const modalWindow = document.querySelector('.modal');
+    const btnAdd = document.querySelector('.panel__add-goods');
+    const tableBody = document.querySelector('.table__body');
+
+    const {openModal, closeModal} = toggleModal(overlay);
+    closeModal();
+
+    const goods = JSON.parse(jsonData);
+    renderGoods(goods);
+
+    modalControl(btnAdd, overlay, openModal, closeModal);
+    deleteControl(tableBody, goods);
   };
 
   window.cms = init;
