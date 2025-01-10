@@ -11,9 +11,10 @@
   <link rel="preload" href="fonts/inter-v7-latin_cyrillic-700.woff2" as="font" type="font/woff2" crossorigin>
 
   <link rel="stylesheet" href="css/index.css">
-  <script src="script/cms-script.js" defer></script>
-  <script>
-    const idBounds = {
+  <script type="module" src="script/cms-script.js"></script>
+  <script type="module">
+    import {init} from './script/cms-script.js';
+    export const idBounds = {
       min: 100000000000000,
       max: 300000000000000,
     };
