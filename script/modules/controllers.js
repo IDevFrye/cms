@@ -30,6 +30,21 @@ export const deleteControl = (tableBody, goods, total) => {
   });
 };
 
+export const openImageControl = (tableBody) => {
+  tableBody.addEventListener('click', e => {
+    const target = e.target;
+    if (target.classList.contains('table__btn_pic')) {
+      const imageURL = target.dataset.pic;
+      const width = 800;
+      const height = 600;
+      const left = (screen.width - width) / 2;
+      const top = (screen.height - height) / 2;
+      window.open(imageURL, '',
+        `width=${width},height=${height},top=${top},left=${left}`);
+    };
+  });
+};
+
 const toggleInput = (input) => {
   input.disabled = !input.disabled;
 };
@@ -80,12 +95,23 @@ export const formControl = (form, goods, cmsTotal,
   });
 
   count.addEventListener('change', () => {
-    total.textContent = `$ ${(count.value * price.value).toFixed(2)}`;
+    total.textContent = `$ 
+    ${(count.value * price.value *
+    (1 - discountCount.value / 100)).toFixed(2)}`;
   });
 
   price.addEventListener('change', () => {
-    total.textContent = `$ ${(count.value * price.value).toFixed(2)}`;
+    total.textContent = `$ 
+    ${(count.value * price.value *
+    (1 - discountCount.value / 100)).toFixed(2)}`;
   });
+
+  discountCount.addEventListener('change', () => {
+    total.textContent = `$ 
+    ${(count.value * price.value *
+    (1 - discountCount.value / 100)).toFixed(2)}`;
+  });
+
 
   form.addEventListener('submit', e => {
     e.preventDefault();

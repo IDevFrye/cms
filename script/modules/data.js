@@ -74,7 +74,7 @@ export const createGood = (formData, id) => ({
   count: Number(formData.get('count')),
   price: Number(formData.get('price')),
   images: {
-    small: formData.get('image') || 'img/default-small.jpg',
-    big: formData.get('image') || 'img/default-big.jpg',
+    small: 'img/' + formData.get('image').name || 'img/default-small.jpg',
+    big: 'img/' + formData.get('image').name || 'img/default-big.jpg',
   },
 });

@@ -27,6 +27,7 @@ export const init = (idBounds) => {
   control.deleteControl(tableBody, goods, totalField);
   control.formControl(modalForm, goods, totalField,
     vendorId, modalTotal, closeModal);
+  control.openImageControl(tableBody);
 };
 
 window.cms = init;

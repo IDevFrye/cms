@@ -24,7 +24,7 @@ const createRow = (item, index) => {
     <td class="table__cell">$${item.price}</td>
     <td class="table__cell">$${item.price * item.count}</td>
     <td class="table__cell table__cell_btn-wrapper">
-      <button class="table__btn table__btn_pic"></button>
+      <button class="table__btn table__btn_pic" data-pic=${item.images.big}></button>
       <button class="table__btn table__btn_edit"></button>
       <button class="table__btn table__btn_del"></button>
     </td>`;
